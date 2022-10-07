@@ -19,27 +19,7 @@ const MESSAGES = {
 connect(process.env.DB_URI as string);
 
 // Utils
-function renderBoard(gameId: ObjectId) {
-  const board = [];
-  let count = 0;
-
-  for (let i = 0; i < 3; i++) {
-    const row = [];
-
-    for (let j = 0; j < 3; j++) {
-      row.push(Markup.button.callback(EMOJI.HIDDEN, `btn-${gameId}-${count}`));
-      count++;
-    }
-
-    board.push(row);
-  }
-
-  // board.push([Markup.button.callback("Окончить игру", `btn-${gameId}-finish`)]);
-
-  return board;
-}
-
-function renderRevealedBoard(gameId: ObjectId, cell: number) {
+function renderBoard(gameId: ObjectId, cell: number = -1) {
   const board = [];
   let count = 0;
 
@@ -114,7 +94,7 @@ bot.action(/^btn-([0-9a-fA-F]{24})-([0-8])/i, async (ctx) => {
   const isWon = instance.cell === Number(ctx.match[2]);
 
   return ctx.editMessageText(isWon ? MESSAGES.WIN : MESSAGES.LOOSE, {
-    ...Markup.inlineKeyboard(renderRevealedBoard(instance.id, instance.cell as number)),
+    ...Markup.inlineKeyboard(renderBoard(instance.id, instance.cell as number)),
     parse_mode: "HTML",
   });
 });
