@@ -1,105 +1,78 @@
-import { ObjectId, connect } from "mongoose";
+import { connect } from "mongoose";
 import { Telegraf, Markup } from "telegraf";
 
+import { renderBoard } from "./ui";
+import { getRandomArbitrary } from "./utils";
+
 import { Game } from "./models";
+import { MESSAGES } from "./consts";
 
-const EMOJI = {
-  WIN: "🍆",
-  LOOSE: "🤡",
-  HIDDEN: "🎰",
-};
+const bot = new Telegraf(process.env.BOT_TOKEN as string);
 
-const MESSAGES = {
-  INIT: "Угадайте, в каком аппарате <b>джекпот</b>!",
-  WIN: "<b>Джекпот! Джекпот!</b>",
-  LOOSE: "<b>Хуй те в рот!</b>",
-};
+async function main() {
+  await connect(process.env.DB_URI as string);
 
-// DB
-connect(process.env.DB_URI as string);
+  bot.start((ctx) => ctx.reply("👍"));
+  bot.help((ctx) => ctx.reply("jackpot? jackpot!"));
 
-// Utils
-function renderBoard(gameId: ObjectId, cell: number = -1) {
-  const board = [];
-  let count = 0;
+  bot.command("stats", (ctx) => ctx.reply("TODO: stats"));
+  bot.command("duel", (ctx) => ctx.reply("TODO: duel"));
+  bot.command("zalupa", async (ctx) => {
+    const instance = new Game({
+      host: ctx.from.id,
+      cell: getRandomArbitrary(0, 8),
+      active: true,
+    });
 
-  for (let i = 0; i < 3; i++) {
-    const row = [];
+    let saved;
 
-    for (let j = 0; j < 3; j++) {
-      const symbol = count === cell ? EMOJI.WIN : EMOJI.LOOSE;
-      row.push(Markup.button.callback(symbol, "0"));
-      count++;
+    try {
+      saved = await instance.save();
+    } catch (error) {
+      console.log("Couldn't create the game instance: ", error);
     }
 
-    board.push(row);
-  }
+    if (!saved) {
+      return;
+    }
 
-  return board;
+    ctx.reply(MESSAGES.INIT, {
+      ...Markup.inlineKeyboard(renderBoard(saved.id)),
+      parse_mode: "HTML",
+    });
+  });
+
+  bot.action(/^btn-([0-9a-fA-F]{24})-([0-8])/i, async (ctx) => {
+    let instance;
+
+    try {
+      instance = await Game.findById(ctx.match[1]).select("cell host");
+    } catch (error) {
+      console.log("Couldn't find game instance: ", error);
+    }
+
+    if (!instance) {
+      return;
+    }
+
+    if (instance.host !== ctx.from?.id) {
+      return;
+    }
+
+    const isWon = instance.cell === Number(ctx.match[2]);
+
+    return ctx.editMessageText(isWon ? MESSAGES.WIN : MESSAGES.LOOSE, {
+      ...Markup.inlineKeyboard(
+        renderBoard(instance.id, instance.cell as number)
+      ),
+      parse_mode: "HTML",
+    });
+  });
+
+  bot.launch();
 }
 
-function getRandomArbitrary(min: number, max: number) {
-  return Math.round(Math.random() * (max - min) + min);
-}
-
-// Bot
-const bot = new Telegraf(process.env.BOT_TOKEN as string);
-bot.start((ctx) => ctx.reply("👍"));
-bot.help((ctx) => ctx.reply("jackpot? jackpot!"));
-
-bot.command("stats", (ctx) => ctx.reply("TODO: stats"));
-bot.command("duel", (ctx) => ctx.reply("TODO: duel"));
-bot.command("zalupa", async (ctx) => {
-  const instance = new Game({
-    host: ctx.from.id,
-    cell: getRandomArbitrary(0, 8),
-    active: true,
-  });
-
-  let saved;
-
-  try {
-    saved = await instance.save();
-  } catch (error) {
-    console.log("Couldn't create the game instance: ", error);
-  }
-
-  if (!saved) {
-    return;
-  }
-
-  ctx.reply(MESSAGES.INIT, {
-    ...Markup.inlineKeyboard(renderBoard(saved.id)),
-    parse_mode: "HTML",
-  });
-});
-
-bot.action(/^btn-([0-9a-fA-F]{24})-([0-8])/i, async (ctx) => {
-  let instance;
-
-  try {
-    instance = await Game.findById(ctx.match[1]).select("cell host");
-  } catch (error) {
-    console.log("Couldn't find game instance: ", error);
-  }
-
-  if (!instance) {
-    return;
-  }
-
-  if (instance.host !== ctx.from?.id) {
-    return;
-  }
-
-  const isWon = instance.cell === Number(ctx.match[2]);
-
-  return ctx.editMessageText(isWon ? MESSAGES.WIN : MESSAGES.LOOSE, {
-    ...Markup.inlineKeyboard(renderBoard(instance.id, instance.cell as number)),
-    parse_mode: "HTML",
-  });
-});
-
-bot.launch();
+main();
 
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
