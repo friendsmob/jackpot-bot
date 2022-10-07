@@ -10,4 +10,10 @@ const MESSAGES = {
   LOOSE: "<b>Хуй те в рот!</b>",
 };
 
-export { EMOJI, MESSAGES };
+const COMMANDS = {
+  GAME: process.env.GAME_COMMAND || "game",
+  STATS: process.env.STATS_COMMAND || "stats",
+  DUEL: process.env.DUEL_COMMAND || "duel",
+};
+
+export { EMOJI, MESSAGES, COMMANDS };

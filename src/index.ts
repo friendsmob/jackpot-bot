@@ -5,7 +5,7 @@ import { renderBoard } from "./ui";
 import { getRandomArbitrary } from "./utils";
 
 import { Game } from "./models";
-import { MESSAGES } from "./consts";
+import { MESSAGES, COMMANDS } from "./consts";
 
 const bot = new Telegraf(process.env.BOT_TOKEN as string);
 
@@ -15,9 +15,9 @@ async function main() {
   bot.start((ctx) => ctx.reply("👍"));
   bot.help((ctx) => ctx.reply("jackpot? jackpot!"));
 
-  bot.command("stats", (ctx) => ctx.reply("TODO: stats"));
-  bot.command("duel", (ctx) => ctx.reply("TODO: duel"));
-  bot.command("zalupa", async (ctx) => {
+  bot.command(COMMANDS.STATS, (ctx) => ctx.reply("TODO: stats"));
+  bot.command(COMMANDS.DUEL, (ctx) => ctx.reply("TODO: duel"));
+  bot.command(COMMANDS.GAME, async (ctx) => {
     const instance = new Game({
       host: ctx.from.id,
       cell: getRandomArbitrary(0, 8),
