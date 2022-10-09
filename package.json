@@ -1,10 +1,10 @@
 {
   "name": "jackpot-bot",
   "version": "2.2.8",
-  "description": "jackpot? jackpot!",
+  "description": "game bot for telegram",
   "main": "src/index.ts",
   "repository": "git@github.com:friendsmob/jackpot-bot.git",
-  "author": "Finga on da Trigga <tsytps@gmail.com>",
+  "author": "Finga on da Trigga",
   "license": "MIT",
   "private": false,
   "scripts": {
@@ -13,7 +13,9 @@
     "serve": "node ./build/index.js"
   },
   "dependencies": {
-    "mongoose": "^6.6.3",
+    "@types/cron": "^2.0.0",
+    "cron": "^2.1.0",
+    "mongoose": "^6.6.5",
     "telegraf": "^4.10.0"
   },
   "devDependencies": {

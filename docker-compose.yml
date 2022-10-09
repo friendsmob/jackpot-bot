@@ -3,9 +3,9 @@ services:
   bot:
     build: ./
     container_name: bot
+    restart: always
     command: ["yarn", "serve"]
-    env_file:
-      .env
+    env_file: .env
     volumes:
       - ./:/usr/src/app
       - /usr/src/app/node_modules/
