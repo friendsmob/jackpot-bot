@@ -1,7 +1,7 @@
 const EMOJI = {
-  WIN: "🍆",
-  LOOSE: "🤡",
-  HIDDEN: "🎰",
+  WIN: process.env.EMOJI_WIN || "💶",
+  LOOSE: process.env.EMOJI_LOOSE || "💨",
+  HIDDEN: process.env.EMOJI_HIDDEN || "🎰",
 };
 
 const MESSAGES = {
@@ -16,4 +16,9 @@ const COMMANDS = {
   DUEL: process.env.DUEL_COMMAND || "duel",
 };
 
-export { EMOJI, MESSAGES, COMMANDS };
+const ACTIONS = {
+  PLAY: /^play-([0-8])/i,
+  FINISH: /^play-(finish)/i,
+};
+
+export { EMOJI, MESSAGES, ACTIONS, COMMANDS };
