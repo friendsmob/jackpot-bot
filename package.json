@@ -4,13 +4,12 @@
   "description": "game bot for telegram",
   "main": "src/index.ts",
   "repository": "git@github.com:friendsmob/jackpot-bot.git",
-  "author": "Finga on da Trigga",
+  "author": "Friends Mob Ltd. <kush.aliens@invading.earth>",
   "license": "MIT",
   "private": false,
   "scripts": {
     "start": "ts-node ./src/index.ts",
-    "build": "tsc ./src/index.ts --outDir build",
-    "serve": "node ./build/index.js"
+    "build": "tsc ./src/index.ts --outDir build"
   },
   "dependencies": {
     "@types/cron": "^2.0.0",
@@ -20,7 +19,7 @@
   },
   "devDependencies": {
     "@tsconfig/node18": "^1.0.1",
-    "@types/node": "^18.8.3",
+    "@types/node": "^18.11.0",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
   }
